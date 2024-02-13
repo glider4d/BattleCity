@@ -74,6 +74,7 @@ namespace Renderer {
 		shaderProgram.m_isCompiled = false;
 	}
 	ShaderProgram& ShaderProgram::operator=(ShaderProgram&& shaderProgram) noexcept {
+		if (this == &shaderProgram) return *this;
 		glDeleteProgram(m_ID);
 		m_ID = shaderProgram.m_ID;
 		m_isCompiled = shaderProgram.m_isCompiled;

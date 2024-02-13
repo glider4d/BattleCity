@@ -8,7 +8,9 @@ namespace Renderer {
 	public:
 		ShaderProgram(const std::string& vertexShader, const std::string& fragmentShader);
 		~ShaderProgram();
-		bool isCompiled() const { return m_isCompiled; }
+		bool isCompiled() const { 
+			return m_isCompiled; 
+		}
 		void use() const;
 
 		ShaderProgram() = delete;
