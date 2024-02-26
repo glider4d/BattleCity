@@ -13,12 +13,30 @@
 #include "stb_image.h"
 
 
-ResourceManager::ResourceManager(const std::string& executablePath) : m_path(executablePath) {
+
+
+ResourceManager::ShaderProgramsMap ResourceManager::m_shaderPrograms;
+ResourceManager::TexturesMap ResourceManager::m_textures;
+ResourceManager::SpritesMap ResourceManager::m_sprites;
+ResourceManager::AnimatedSpritesMap ResourceManager::m_animatedSprites;
+std::string ResourceManager::m_path;
+
+
+
+void ResourceManager::setExecutablePath(const std::string& executablePath) {
+	m_path = executablePath;
 	m_path = m_path.substr(0, executablePath.find_last_of("/\\"));
 
 }
 
-std::string ResourceManager::getFileString(const std::string& relativeFilePath) const{
+void ResourceManager::unloadAllResources() {
+	m_shaderPrograms.clear();
+	m_textures.clear();
+	m_sprites.clear();
+	m_animatedSprites.clear();
+}
+
+std::string ResourceManager::getFileString(const std::string& relativeFilePath) {
 	std::ifstream f;
 
  

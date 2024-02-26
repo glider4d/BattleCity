@@ -12,11 +12,15 @@ add_executable(${PROJECT_NAME}
     src/Renderer/ShaderProgram.h
     src/Renderer/Texture2D.cpp
     src/Renderer/Texture2D.h
+    src/Renderer/sprite.cpp
+    src/Renderer/sprite.h
+    src/Renderer/AnimatedSprite.cpp
+    src/Renderer/AnimatedSprite.h
     src/Resources/ResourceManager.cpp
     src/Resources/ResourceManager.h
     src/Resources/stb_image.h
-    src/Renderer/sprite.cpp
-    src/Renderer/sprite.h
+    src/Game/Game.cpp
+    src/Game/Game.h
 )
 
 #target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
