@@ -5,10 +5,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
+#include <chrono>
+
 #include "Renderer/ShaderProgram.h"
 #include "Resources/ResourceManager.h"
 #include "Renderer/Texture2D.h"
 #include "Renderer/Sprite.h"
+#include "Renderer/AnimatedSprite.h"
 
 
 glm::ivec2 g_windowSize(640, 480);
@@ -52,6 +55,8 @@ const char* fragment_shader =
 "   frag_color = vec4(color, 1.0);"
 "};";*/
 
+bool isEagle = false;
+
 void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height) {
     g_windowSize.x = width;
     g_windowSize.y = height;
@@ -61,6 +66,9 @@ void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height) {
 void glfwKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mode) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(pWindow, GL_TRUE);
+    } 
+    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
+        isEagle = !isEagle;
     }
 }
 
@@ -122,7 +130,13 @@ int main(int argc, char** argv)
 
         auto tex = resourceManager.loadTexture("DefaultTexture", "res\\textures\\map_16x16.png");
 
-        std::vector<std::string> subTexturesNames = {"eagle", "deadeagle", "littleSpark", "mediumSpark", "bigSpark", "veryBigSpark"};
+        std::vector<std::string> subTexturesNames = { "eagle",
+                                                     "deadeagle",
+                                                     "spark1",
+                                                     "spark2",
+                                                     "spark3",
+                                                     "veryBigSpark" };
+
         auto pTextureAtlas = resourceManager.loadTextureAtlas("DefaultTextureAtlas", "res\\textures\\map_16x16.png", std::move(subTexturesNames), 16, 16);
 
 
@@ -130,6 +144,22 @@ int main(int argc, char** argv)
         pSprite->setPosition(glm::vec2(300, 100));
 
 
+        auto pAnimatedSprite = resourceManager.loadAnimatedSprite("NewAnimatedSprite", "DefaultTextureAtlas", "SpriteShader", 100, 100, "eagle");
+        pAnimatedSprite->setPosition(glm::vec2(300, 300));
+        std::vector<std::pair<std::string, uint64_t>> eagleState;
+        eagleState.emplace_back(std::make_pair<std::string, uint64_t>("eagle", 1000000000));
+        eagleState.emplace_back(std::make_pair<std::string, uint64_t>("deadeagle", 1000000000));
+
+        std::vector<std::pair<std::string, uint64_t>> sparkState;
+        sparkState.emplace_back(std::make_pair<std::string, uint64_t>("spark1", 1000000000));
+        sparkState.emplace_back(std::make_pair<std::string, uint64_t>("spark2", 1000000000));
+        sparkState.emplace_back(std::make_pair<std::string, uint64_t>("spark3", 1000000000));
+
+
+        pAnimatedSprite->insertState("eagleState", std::move(eagleState));
+        pAnimatedSprite->insertState("sparkState", std::move(sparkState));
+
+        pAnimatedSprite->setState("sparkState");
         //VBO
 
         GLuint points_vbo = 0;
@@ -184,10 +214,22 @@ int main(int argc, char** argv)
         pSpriteShaderProgram->setInt("tex", 0);
         pSpriteShaderProgram->setMatrix4("projectionMat", projectionMatrix);
 
+        auto lastTime = std::chrono::high_resolution_clock::now();
+
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(pWindow))
         {
+            if (isEagle) {
+                pAnimatedSprite->setState("eagleState");
+            }
+            else {
+                pAnimatedSprite->setState("sparkState");
+            }
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            uint64_t duration = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - lastTime).count();
+            lastTime = currentTime;
 
+            pAnimatedSprite->update(duration);
             /* Render here */
             glClear(GL_COLOR_BUFFER_BIT);
 
@@ -203,7 +245,7 @@ int main(int argc, char** argv)
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
             pSprite->render();
-
+            pAnimatedSprite->render();
             /* Swap front and back buffers */
             glfwSwapBuffers(pWindow);
 
