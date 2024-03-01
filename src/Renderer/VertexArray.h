@@ -3,7 +3,7 @@
 #include "VertexBufferLayout.h"
 
 
-namespace Renderer {
+namespace RenderEngine {
 	class VertexArray {
 	public:
 		VertexArray();

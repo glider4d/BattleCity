@@ -5,7 +5,7 @@
 #include <glm/ext/vector_float2.hpp>
 #include <map>
 
-namespace Renderer {
+namespace RenderEngine {
 	class Texture2D final {
 	public:
 

@@ -11,7 +11,7 @@
 
 
 
-namespace Renderer {
+namespace RenderEngine {
 	class Texture2D;
 	class ShaderProgram;
 
